@@ -1,4 +1,4 @@
-module Atevann/botec
+module botec
 
 go 1.21.5
 

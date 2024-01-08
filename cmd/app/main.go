@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Atevann/botec/config"
-	"Atevann/botec/internal/service/bot/telegram"
+	"botec/config"
+	"botec/internal/service/bot/telegram"
 	telebot "gopkg.in/telebot.v3"
 	"log"
 )
