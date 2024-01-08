@@ -1,0 +1,3 @@
+# Шаблон для конфига config.toml
+[bot]
+    token=""
