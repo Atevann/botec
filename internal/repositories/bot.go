@@ -1,17 +1,17 @@
 package repositories
 
 import (
+	"botec/internal/dependencies"
 	"botec/internal/models"
-	"gorm.io/gorm"
 )
 
 // BotRepository Структура репозитория
 type BotRepository struct {
-	db *gorm.DB
+	db *dependencies.MySql
 }
 
 // NewBotRepository Инициализация репозитория ботов
-func NewBotRepository(database *gorm.DB) *BotRepository {
+func NewBotRepository(database *dependencies.MySql) *BotRepository {
 	return &BotRepository{db: database}
 }
 

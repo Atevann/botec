@@ -1,5 +1,5 @@
 # Шаблон для конфига config.toml
-[database]
+[MySql]
     hostname = "mysql"
     name     = "botec"
     username = "botec-user"
