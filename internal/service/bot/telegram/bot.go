@@ -3,7 +3,6 @@ package telegram
 import (
 	"botec/internal/repositories"
 	telebot "gopkg.in/telebot.v3"
-	"gorm.io/gorm"
 	"log"
 	"sync"
 	"time"
@@ -15,8 +14,7 @@ type Bot struct {
 }
 
 // InitBots инициализирует всех ботов
-func InitBots(db *gorm.DB) error {
-	botRepo := repositories.NewBotRepository(db)
+func InitBots(botRepo *repositories.BotRepository) error {
 	bots, err := botRepo.GetAll()
 
 	if err != nil {
