@@ -16,10 +16,15 @@ func NewConfig() Config {
 	return *cfg
 }
 
+// Config структура конфигурации
 type Config struct {
-	Bot Bot
+	Database Database
 }
 
-type Bot struct {
-	Token string
+// Конфиг базы данных
+type Database struct {
+	Hostname string
+	Name     string
+	Username string
+	Password string
 }

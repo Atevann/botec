@@ -1,0 +1,28 @@
+version: '3'
+services:
+  botec:
+      container_name: botec
+      image: golang
+      restart: always
+      depends_on:
+        - mysql
+      volumes:
+        - ../:/usr/src/code
+      working_dir: /usr/src/code
+      ports:
+        - 80:80
+      entrypoint: go run cmd/app/main.go
+
+  mysql:
+    container_name: mysql
+    build:
+      context: database
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - botec-mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+volumes:
+  botec-mysql-data: {}

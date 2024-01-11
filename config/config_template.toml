@@ -1,3 +1,6 @@
 # Шаблон для конфига config.toml
-[bot]
-    token=""
+[database]
+    hostname = "mysql"
+    name     = "botec"
+    username = "botec-user"
+    password = "botec-Pa5Sw0rD!"
