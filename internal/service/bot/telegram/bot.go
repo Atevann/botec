@@ -1,20 +1,22 @@
 package telegram
 
 import (
+	"botec/internal/models"
 	"botec/internal/repositories"
+	"encoding/json"
+	"errors"
+	"fmt"
 	telebot "gopkg.in/telebot.v3"
 	"log"
 	"sync"
-	"time"
 )
 
-// Bot структура телеграм бота
-type Bot struct {
-	Bot *telebot.Bot
-}
-
 // InitBots инициализирует всех ботов
-func InitBots(botRepo *repositories.BotRepository) error {
+func InitBots(
+	botRepo *repositories.BotRepository,
+	actionsList *repositories.ActionsList,
+	botActionsRepo *repositories.BotActionsRepository,
+) error {
 	bots, err := botRepo.GetAll()
 
 	if err != nil {
@@ -25,14 +27,15 @@ func InitBots(botRepo *repositories.BotRepository) error {
 
 	for _, bot := range bots {
 		wg.Add(1)
-		runningBot, err := NewBot(bot.Token)
+		runningBot, err := bot.Init()
 
 		if err != nil {
-			log.Println("Ошибка запуска бота")
+			log.Printf("Ошибка запуска бота: %v", err)
+
 			continue
 		}
 
-		go runningBot.serve(&wg)
+		go serve(&wg, runningBot, actionsList, botActionsRepo)
 	}
 
 	wg.Wait()
@@ -41,30 +44,44 @@ func InitBots(botRepo *repositories.BotRepository) error {
 }
 
 // serve Запуск бота
-func (Bot *Bot) serve(wg *sync.WaitGroup) {
+func serve(
+	wg *sync.WaitGroup,
+	bot *models.Bot,
+	actionsList *repositories.ActionsList,
+	actionsRepo *repositories.BotActionsRepository,
+) {
 	defer func() {
-		Bot.Bot.Stop()
+		bot.Stop()
 		wg.Done()
 	}()
 
-	Bot.Bot.Handle(telebot.OnText, func(c telebot.Context) error {
-		return c.Send(c.Text())
+	bot.Handle(telebot.OnText, func(ctx telebot.Context) error {
+		botAction, err := actionsRepo.GetNextAction(bot.Id, 0, "")
+
+		if err != nil {
+			log.Printf("Ошибка при получении следующего экшена: %v", err)
+
+			return err
+		}
+
+		action, isPresent := actionsList.GetOneByName(botAction.Action_name)
+
+		if !isPresent {
+			log.Printf("Экшен не существует: %v", botAction.Action_name)
+
+			return errors.New(fmt.Sprintf("Экшен не существует: %v", botAction.Action_name))
+		}
+
+		action.SetContext(ctx)
+
+		if json.Unmarshal([]byte(botAction.Action_data), &action) != nil {
+			log.Printf("Ошибка декодирования экшена: %v", err)
+
+			return err
+		}
+
+		return action.Execute()
 	})
 
-	Bot.Bot.Start()
-}
-
-// NewBot Создание нового бота по токену
-func NewBot(token string) (*Bot, error) {
-	bot, err := telebot.NewBot(
-		telebot.Settings{
-			Token:  token,
-			Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
-		})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &Bot{Bot: bot}, nil
+	bot.Start()
 }
