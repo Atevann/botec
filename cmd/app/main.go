@@ -13,6 +13,8 @@ func main() {
 			dependencies.NewConfig,
 			dependencies.NewMySql,
 			repositories.NewBotRepository,
+			repositories.NewActionsList,
+			repositories.NewBotActionsRepository,
 		),
 		fx.Invoke(
 			telegram.InitBots,

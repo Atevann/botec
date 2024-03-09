@@ -5,7 +5,7 @@ import (
 	"botec/internal/models"
 )
 
-// BotRepository Структура репозитория
+// BotRepository Репозиторий ботов
 type BotRepository struct {
 	db *dependencies.MySql
 }
@@ -16,10 +16,10 @@ func NewBotRepository(database *dependencies.MySql) *BotRepository {
 }
 
 // GetOneById Получение одного бота по ID
-func (br *BotRepository) GetOneById(id uint) (*models.Bot, error) {
+func (repo *BotRepository) GetOneById(id uint) (*models.Bot, error) {
 	var bot models.Bot
 
-	result := br.db.First(&bot, id)
+	result := repo.db.First(&bot, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -29,10 +29,10 @@ func (br *BotRepository) GetOneById(id uint) (*models.Bot, error) {
 }
 
 // GetAll Получение всех ботов
-func (br *BotRepository) GetAll() ([]*models.Bot, error) {
+func (repo *BotRepository) GetAll() ([]*models.Bot, error) {
 	var bots []*models.Bot
 
-	result := br.db.Find(&bots)
+	result := repo.db.Find(&bots)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -42,15 +42,15 @@ func (br *BotRepository) GetAll() ([]*models.Bot, error) {
 }
 
 // Update Обновление записи бота
-func (br *BotRepository) Update(bot *models.Bot) error {
-	result := br.db.Save(bot)
+func (repo *BotRepository) Update(bot *models.Bot) error {
+	result := repo.db.Save(bot)
 
 	return result.Error
 }
 
 // Delete Удаление записи бота
-func (br *BotRepository) Delete(bot *models.Bot) error {
-	result := br.db.Delete(bot)
+func (repo *BotRepository) Delete(bot *models.Bot) error {
+	result := repo.db.Delete(bot)
 
 	return result.Error
 }
